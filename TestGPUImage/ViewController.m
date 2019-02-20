@@ -7,6 +7,8 @@
 //
 
 #import "ViewController.h"
+#import "GPUImage.h"
+#import "GPUImageBeautifyFilter.h"
 
 @interface ViewController ()
 
@@ -16,8 +18,32 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    UIImage *inputImage = [UIImage imageNamed:@"test.jpg"];
+    
+    UIImageView *imageView0 = [[UIImageView alloc]initWithFrame:CGRectMake(0, 64, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * 9 / 16)];
+    imageView0.image = inputImage;
+    [self.view addSubview:imageView0];
+    
+    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(imageView0.frame) + 20, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * 9 / 16)];
+    imageView.image = [self imageProcessdUsingGPUImage:inputImage];
+    [self.view addSubview:imageView];
+    
 }
 
+
+- (UIImage *)imageProcessdUsingGPUImage:(UIImage *)imageToProcess {
+    GPUImagePicture *stillImageSource = [[GPUImagePicture alloc]initWithImage:imageToProcess];
+    // 设置滤镜
+    GPUImageSepiaFilter *stillImageFilter = [[GPUImageSepiaFilter alloc]init];
+    [stillImageSource addTarget:stillImageFilter];
+    [stillImageFilter useNextFrameForImageCapture];
+    [stillImageSource processImage];
+    
+    UIImage *currentFilteredVideoFrame = [stillImageFilter imageFromCurrentFramebuffer];
+    return currentFilteredVideoFrame;
+}
 
 @end
